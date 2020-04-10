@@ -259,7 +259,7 @@ for data_dirpath, train_filepaths, test_filepaths in data_filepaths:
       pose2tow = np.loadtxt(absolute_pose_paths[idx+offset_idx])
       posewto0 = data_utils.inverse_pose(pose0tow)
       pose1to0 = data_utils.compose_pose(posewto0, pose1tow)
-      pose2to0 = data_utils.compose_pose(posewto0, pose1tow)
+      pose2to0 = data_utils.compose_pose(posewto0, pose2tow)
       parallax1to0 = np.linalg.norm(pose1to0[:3, 3])
       parallax2to0 = np.linalg.norm(pose2to0[:3, 3])
 
