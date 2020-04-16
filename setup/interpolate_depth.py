@@ -43,7 +43,8 @@ def process_frame(args):
   sz, vm = data_utils.load_depth_with_validity_map(sparse_depth_path)
   iz = data_utils.interpolate_depth(sz, vm)
 
-  sparse_depth_ref_path = os.path.join(*sparse_depth_path.split(os.sep)[2:])
+  sparse_depth_ref_path = os.path.join(*sparse_depth_path.split(os.sep)[5:])
+  
   # Set output paths
   sparse_depth_output_path = sparse_depth_path
   interp_depth_output_path = os.path.join(VOID_OUT_DIRPATH, sparse_depth_ref_path) \
@@ -56,7 +57,7 @@ def process_frame(args):
   # Write to disk
   data_utils.save_depth(iz, interp_depth_output_path)
 
-  return (sparse_depth_output_path, interp_depth_output_path, validity_map_output_path)
+  return (sparse_depth_ref_path, sparse_depth_output_path, interp_depth_output_path, validity_map_output_path)
 
 
 parser = argparse.ArgumentParser()
@@ -84,12 +85,8 @@ for data_dirpath, test_filepaths in data_filepaths:
 
   # Get test set directories
   test_seq_dirpaths = set(
-      [test_image_paths[idx].split(os.sep)[-3] for idx in range(len(test_image_paths))])
+      [test_sparse_depth_paths[idx].split(os.sep)[-3] for idx in range(len(test_sparse_depth_paths))])
 
-  # Initialize placeholders for training output paths
-  train_sparse_depth_output_paths = []
-  train_interp_depth_output_paths = []
-  train_validity_map_output_paths = []
   # Initialize placeholders for testing output paths
   test_sparse_depth_output_paths = []
   test_interp_depth_output_paths = []
@@ -102,16 +99,15 @@ for data_dirpath, test_filepaths in data_filepaths:
     # For each sequence, grab the images, sparse depths and valid maps
     sparse_depth_paths = sorted(glob.glob(os.path.join(seq_dirpath, 'sparse_depth', '*.png')))
     validity_map_paths = sorted(glob.glob(os.path.join(seq_dirpath, 'validity_map', '*.png')))
-
-    # Load intrinsics and process first
-    interp_depth_output_dirpath = os.path.join(os.path.dirname(intrinsics_output_path), 'interp_depth')
-
+    
+    interp_depth_output_dirpath = os.path.join(VOID_OUT_DIRPATH, *seq_dirpath.split(os.sep)[5:], 'interp_depth')
+    #print('hej',iinterp_depth_output_dirpath) 
     for output_dirpath in [interp_depth_output_dirpath]:
       if not os.path.exists(output_dirpath):
         os.makedirs(output_dirpath)
-
+    
     pool_inputs = []
-    for idx in range(len(image_paths)):
+    for idx in range(len(sparse_depth_paths)):
       # Find images with enough parallax, pose are from camera to world
       pool_inputs.append(
           (sparse_depth_paths[idx],
@@ -125,11 +121,11 @@ for data_dirpath, test_filepaths in data_filepaths:
       pool_results = pool.map(process_frame, pool_inputs)
 
       for result in pool_results:
-        sparse_depth_output_path, interp_depth_output_path, \
+        sparse_depth_ref_path, sparse_depth_output_path, interp_depth_output_path, \
             validity_map_output_path = result
 
         # Split into training, testing and unused testing sets
-        if image_ref_path in test_image_paths:
+        if sparse_depth_ref_path in test_sparse_depth_paths:
           test_sparse_depth_output_paths.append(sparse_depth_output_path)
           test_interp_depth_output_paths.append(interp_depth_output_path)
           test_validity_map_output_paths.append(validity_map_output_path)
