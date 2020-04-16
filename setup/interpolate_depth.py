@@ -33,6 +33,7 @@ TEST_REFS_DIRPATH       = 'testing'
 # VOID testing set 150 density
 VOID_TEST_SPARSE_DEPTH_150_FILEPATH     = os.path.join(TEST_REFS_DIRPATH, 'void_test_sparse_depth_150.txt')
 VOID_TEST_INTERP_DEPTH_150_FILEPATH     = os.path.join(TEST_REFS_DIRPATH, 'void_test_interp_depth_150.txt')
+VOID_TEST_VALIDITY_MAP_150_FILEPATH     = os.path.join(TEST_REFS_DIRPATH, 'void_test_validity_map_150.txt')
 
 
 def process_frame(args):
