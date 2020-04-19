@@ -194,10 +194,6 @@ for data_dirpath, train_filepaths, test_filepaths in data_filepaths:
     intrinsics_output_path = os.path.join(VOID_OUT_DIRPATH, intrinsics_ref_path[:-3]+'npy')
     image_output_dirpath = os.path.join(os.path.dirname(intrinsics_output_path), 'image')
     interp_depth_output_dirpath = os.path.join(os.path.dirname(intrinsics_output_path), 'interp_depth')
- 
-    interp_depth_output_dirpath = os.path.join(os.path.dirname(os.path.join(*os.path.join(seq_dirpath, 'K.txt').split(os.sep)[2:])[:-3]+'npy'), 'interp_depth')
-    print("hej", interp_depth_output_dirpath)
-    return 0
 
     for output_dirpath in [image_output_dirpath, interp_depth_output_dirpath]:
       if not os.path.exists(output_dirpath):
